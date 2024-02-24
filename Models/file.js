@@ -10,7 +10,7 @@ const fileSchema = new mongoose.Schema({
         type : String,
         require : true
     },
-    tags : {
+    tag : {
         type:String
     },
     email : {

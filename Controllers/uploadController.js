@@ -1,9 +1,10 @@
-const file = require('../Models/file');
+const File = require('../Models/file');
 
 //LocalFileUpload -> Handler Function.
 exports.localFileUpload = async(req,res) => {
     try{
         //Fetch the file from the request.
+        const {name,tag,email} = req.body;
         const file = req.files.file; //We are using .file to fetch the data because we have given the name file in the request data.
         console.log("File Data -> ",file);
 
@@ -17,6 +18,9 @@ exports.localFileUpload = async(req,res) => {
             console.log(error);
         }); 
 
+        //Storing data into the database.
+        const dataFile = File.create({name,tag,email});
+        
         res.status(200).json({
             success:true,
             message:"File has been successfully uploaded to the local server."
@@ -24,7 +28,7 @@ exports.localFileUpload = async(req,res) => {
     }
     catch(error){
         res.status(500).json({
-            success:true,
+            success:false,
             message:"There is Error while uploading the file.",
             data:error
         })
