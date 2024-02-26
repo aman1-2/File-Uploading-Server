@@ -16,11 +16,20 @@ function isFileSupported(fileType, supportedType){
 /*Since we will be needing this function to upload the file therefore we have made universally.
 Made it async because we are going to upload a file.
 You have provided the data which file and at what or where you have to upload that file.*/
-async function fileUploadCloudinary(file, folder){
+async function fileUploadCloudinary(file, folder, quality){
+    /*Inside this quality attribute is used for ensuring the quality of the content if the
+    quality has avalid value then it will be added in the options otherwise not.This will
+    either increase or decrease the quality of the content and accordingly re-sizes or reduces
+    the video or image size.*/
     const options = {folder};
+
+    if(quality)
+        options.quality = quality;
+
     options.resource_type = "auto"; //Mostly required for the case of video Upload and it will detect the type of file automatically.
     return await cloudinary.uploader.upload(file.tempFilePath,options);
 }
+
 
 //LocalFileUpload -> Handler Function.
 exports.localFileUpload = async(req,res) => {
@@ -150,6 +159,54 @@ exports.videoUpload = async (req,res) => {
             message : "Error while the Video Upload Might be not able to Extract file."
         });
     }
+}
+
+//imageSizeReducer -> Handler Function
+exports.imageSizeReducer = async (req,res) => {
+    //Step 1 -> Is to create a folder in the cloudinary from the media Explore or media Library Option.
+    try{
+        //Step 2 -> Fetching all the data from the request body.
+        const {name,tag,email} = req.body;
+        const file = req.files.imageFile; //This will extract the file from the request body.
+
+        //Step 3 -> Data validation.That will check that which type of image can be supported.
+        const supportedType = ["jpeg", "jpg", "png"]; //The values present in the array is only supported for my file to be uploded on the cloudinary server.
+        const fileType = file.name.split('.')[1].toLowerCase(); /*This will extract the file extension
+        from the file you have send from its name attribute and will at last convert the data into lower case for the shake of the safety.*/
+
+        if(!isFileSupported(fileType, supportedType)){
+            //Here we can put a restriction of that we just want to upload a file of size less than 5MB or so on.
+            res.status(400).json({
+                success : false,
+                message : "Error while validating the file during the time of File upload at the cloudinary."
+            });
+        }
+
+        //Step 4 -> Upload this to the Cloudinary Database.If this file is of supported type.
+        const response = await fileUploadCloudinary(file, "FileUploadDataBase", 30);
+
+        //Step 5 -> Is to create an entry in the database.
+        const fileData = File.create({name,
+            tag,
+            email,
+            imageUrl:response.secure_url
+        });
+
+        //Last step is if a successful entry is made then make a Success Response.
+        res.status(200).json({
+            success : true,
+            message : "Image File has been successfully uploaded to the Cloudinary.",
+            imageUrl: response.secure_url
+        });
+    }
+    catch(error){
+        console.log(error);
+        res.status(500).json({
+            success : false,
+            message : "Error while the Image Size Reducer Upload Might be not able to Extract file."
+        });
+    }
+
 }
 
 

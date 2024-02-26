@@ -9,5 +9,6 @@ const uploadRoute = require('../Controllers/uploadController');
 router.post('/localFileUpload',uploadRoute.localFileUpload);
 router.post('/imageUpload',uploadRoute.imageUpload);
 router.post('/videoUpload',uploadRoute.videoUpload);
+router.post('/imageSizeReducer',uploadRoute.imageSizeReducer);
 
 module.exports = router;
