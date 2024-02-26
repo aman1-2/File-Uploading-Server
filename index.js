@@ -7,7 +7,10 @@ const app = express(); //Creates an instance of the express.
 
 //Adding middlewares.
 app.use(express.json()); //For parsing json data.
-app.use(fileUpload()); //For storing the files in the server and its information in the database.
+app.use(fileUpload({
+    useTempFiles : true,
+    tempFileDir : '/tmp/'
+})); //For storing the files in the server and its information in the database.
 
 //Loading .env file into process.
 require('dotenv').config();
