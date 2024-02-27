@@ -60,4 +60,12 @@ fileSchema.post("save",async function(doc){
     }
 })
 
+/*These pre and post middleware are for defining the functionalities for our model of what
+we want to perform once we have either made a database entry or we have deleted some entry
+from the database.Pre is for applying the functionality just before the db entry has been made
+and post is for functionality just after the db has made the entry.
+
+One more note thing is that we should always write or make the middleware or plugins before
+the model creation.*/
+
 module.exports = mongoose.model("File",fileSchema);
